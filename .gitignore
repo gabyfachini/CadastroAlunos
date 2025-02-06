@@ -6,3 +6,9 @@ CadastroAlunos/.vs/CadastroAlunos/v17/.suo
 *.vsidx
 *.props
 *.targets
+*.cs
+*.cache
+*.txt
+*.BuildWithSkipAnalyzers
+*.Up2Date
+*.editorconfig

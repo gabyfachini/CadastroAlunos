@@ -16,7 +16,7 @@ namespace CadastroAlunos.Models
             _alunoService = alunoService;
         }
 
-        public void BuscarAluno()
+        public void StudentList()
         {
             Console.Clear();
             Console.WriteLine("REGISTRO DE ALUNOS\n");

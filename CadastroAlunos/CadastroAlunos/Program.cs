@@ -35,11 +35,11 @@ internal class Program
                     break;
 
                 case "2":
-                    alunoPresentation?.BuscarAluno(); // Garantir que não é nulo
+                    alunoPresentation?.StudentList(); // Garantir que não é nulo
                     break;
 
                 case "3":
-
+                    
                     break;
 
                 case "4":
