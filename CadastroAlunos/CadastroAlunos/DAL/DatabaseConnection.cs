@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-internal static class _connectionString
+internal static class DatabaseConnection
 {
     private static IConfiguration Configuration { get; }
 
-    static _connectionString()
+    static DatabaseConnection()
     {
         var builder = new ConfigurationBuilder()
             .SetBasePath(AppContext.BaseDirectory)
@@ -16,4 +16,4 @@ internal static class _connectionString
     {
         return Configuration.GetConnectionString(name);
     }
-} //Método de conexão com o banco de dados
+} 

@@ -10,6 +10,7 @@ namespace CadastroAlunos.Interfaces
 {
     public interface IAlunoRepository
     {
-        List<Student> GetList();
+        List<Aluno> GetList(); //Vale para o case 2 e 3
+        Task SoftDelete(int id); //SoftDelete
     }
 }

@@ -17,33 +17,37 @@ internal class Program
     {
         ConfigureServices(); // Configuração da injeção de dependência
 
-        var alunoPresentation = serviceProvider.GetService<StudentPresentation>();
+        var alunoPresentation = serviceProvider.GetService<AlunoPresentation>();
 
         Console.WriteLine("GERENCIADOR DE ALUNOS");
         Console.WriteLine();
 
         while (true)
         {
-            ExibirMenu();
+            Menu();
             string opcao = Console.ReadLine();
             Console.WriteLine();
 
             switch (opcao)
             {
                 case "1":
-
+                    alunoPresentation.RegisterStudents();
                     break;
 
                 case "2":
-                    alunoPresentation?.StudentList(); // Garantir que não é nulo
+                    alunoPresentation.StudentList(); 
                     break;
 
                 case "3":
-                    
+                    alunoPresentation.StudentSearch();
                     break;
 
                 case "4":
+                    alunoPresentation.UpdateStudents();
+                    break;
 
+                case "5":
+                    alunoPresentation.DeleteStudents();
                     break;
 
                 case "0":
@@ -56,7 +60,7 @@ internal class Program
             }
         }
     }
-    private static void ExibirMenu()
+    private static void Menu()
     {
         Console.WriteLine("1. Cadastrar Aluno");
         Console.WriteLine("2. Listar Alunos");
@@ -74,8 +78,8 @@ internal class Program
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build())
             .AddScoped<IAlunoRepository, AlunoDAL>() //criados por solicitação
-            .AddScoped<IAlunoService, StudentService>() //criados por solicitação
-            .AddScoped<StudentPresentation>() //criados por solicitação
+            .AddScoped<IAlunoService, AlunoService>() //criados por solicitação
+            .AddScoped<AlunoPresentation>() //criados por solicitação
             .BuildServiceProvider(); //cria o provedor de serviços
     }
 }

@@ -18,9 +18,9 @@ namespace CadastroAlunos.DAL
         {
             _connectionString = iconfiguration.GetConnectionString("Default");
         }
-        public List<Student> GetList()
+        public List<Aluno> GetList()
         {
-            var listAluno = new List<Student>();
+            var listAluno = new List<Aluno>();
             try
             {
                 using (SqlConnection con = new SqlConnection(_connectionString))
@@ -32,7 +32,7 @@ namespace CadastroAlunos.DAL
                     SqlDataReader rdr = cmd.ExecuteReader();
                     while (rdr.Read())
                     {
-                        listAluno.Add(new Student
+                        listAluno.Add(new Aluno
                         {
                             Id = Convert.ToInt32(rdr[0]),
                             Nome = Convert.ToString(rdr[1]),
@@ -59,6 +59,44 @@ namespace CadastroAlunos.DAL
                 throw ex;
             }
             return listAluno;
+        }
+        Task IAlunoRepository.SoftDelete(int id)
+        {
+                // Query SQL para atualizar o campo Ativo no banco de dados
+                var sql = @"
+            UPDATE Aluno 
+            SET Ativo = 0, DataDeAtualizacao = @DataDeAtualizacao 
+            WHERE Id = @Id";
+
+                // Conexão com o banco de dados
+                using (var connection = new SqlConnection(_connectionString))
+                {
+                    using (var command = new SqlCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", id);
+                        command.Parameters.AddWithValue("@DataDeAtualizacao", DateTime.Now);
+
+                        try
+                        {
+                            connection.Open();
+                            int rowsAffected = command.ExecuteNonQuery();
+
+                            if (rowsAffected > 0)
+                            {
+                                Console.WriteLine($"Aluno com ID {id} foi marcado como inativo.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Aluno não encontrado no banco de dados.");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Erro ao desativar aluno: {ex.Message}");
+                        }
+                    }
+                }
+
         }
     }
 }
