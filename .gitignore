@@ -1,0 +1,8 @@
+*.json
+*.dll
+*.exe
+*.pdb
+CadastroAlunos/.vs/CadastroAlunos/v17/.suo
+*.vsidx
+*.props
+*.targets
