@@ -10,6 +10,6 @@ namespace CadastroAlunos.Interfaces
     public interface IAlunoService
     {
         List<Aluno> ListarAlunos(); //Vale para o case 2 e 3
-        Task ExcluirAluno(int id); //SoftDelete
+        void SoftDelete(string connectionString, int alunoId);
     }
 }

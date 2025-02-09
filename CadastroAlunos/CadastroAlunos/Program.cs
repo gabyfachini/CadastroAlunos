@@ -47,7 +47,7 @@ internal class Program
                     break;
 
                 case "5":
-                    alunoPresentation.DeleteStudents();
+                    alunoPresentation.SoftDelete();
                     break;
 
                 case "0":
@@ -56,6 +56,8 @@ internal class Program
 
                 default:
                     Console.WriteLine("Opção inválida!");
+                    Thread.Sleep(2000); //Agurda 2s para limpar e pedir o menu novamente
+                    Console.Clear();
                     continue; // Continua pedindo a opção
             }
         }
@@ -72,14 +74,14 @@ internal class Program
     }
     private static void ConfigureServices() //Método da injeção de dependência
     {
-        serviceProvider = new ServiceCollection()
+        serviceProvider = new ServiceCollection() //Coleção de serviços para registrar no contêiner de DI
             .AddSingleton<IConfiguration>(new ConfigurationBuilder() //instancia compartilhada entre todos os componentes, usada sempre
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build())
-            .AddScoped<IAlunoRepository, AlunoDAL>() //criados por solicitação
+            .AddScoped<IAlunoRepository, AlunoRepository>() //criados por solicitação, sempre sera uma nova instância para cada requisição
             .AddScoped<IAlunoService, AlunoService>() //criados por solicitação
             .AddScoped<AlunoPresentation>() //criados por solicitação
-            .BuildServiceProvider(); //cria o provedor de serviços
+            .BuildServiceProvider(); //cria o provedor de serviços, que é o que vai gerenciar a criação e a resolução dos serviços no restante do código
     }
 }
