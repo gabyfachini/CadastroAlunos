@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CadastroAlunos.Models
@@ -31,10 +32,10 @@ namespace CadastroAlunos.Models
 
             novoAluno.Nome = ObterEntradaValida("Digite o nome do aluno:", "Nome deve ter entre 2 e 100 caracteres e não pode ser vazio.");
             novoAluno.Sobrenome = ObterEntradaValida("Digite o sobrenome do aluno:", "Sobrenome deve ter entre 2 e 100 caracteres e não pode ser vazio.");
-            novoAluno.Nascimento = ObterDataValida("Digite a data de nascimento (formato: YYYY-MM-DD):");
+            novoAluno.Nascimento = ObterDataNascimento("Digite a data de nascimento | Formato DD/MM/AAAA):");
             novoAluno.Sexo = ObterSexoValido("Digite o sexo (M/F):");
-            novoAluno.Email = ObterEmailValido("Digite o email:", "E-mail inválido ou o e-mail não pertence ao domínio 'exemplo.com'.");
-            novoAluno.Telefone = ObterEntradaValida("Digite o telefone:", "Telefone não pode ser vazio.");
+            novoAluno.Email = ObterEmailValido("Digite o email:", "E-mail inválido!");
+            novoAluno.Telefone = ObterTelefoneValido("Digite o telefone | Formato (XX) 9XXXX-XXXX:", "Telefone incorreto!");
 
             novoAluno.DataDeAtualizacao = novoAluno.DataDeCadastro = DateTime.Now;
             novoAluno.Ativo = true;
@@ -70,7 +71,7 @@ namespace CadastroAlunos.Models
                 Console.WriteLine($"Erro ao buscar endereço: {ex.Message}");
             }
             Thread.Sleep(5000); //aqui ta aparecendo o menu antes dos dados
-            Console.Clear();
+            /*Console.Clear();*/
         }
 
         public void StudentList()
@@ -179,9 +180,10 @@ namespace CadastroAlunos.Models
             } while (true);
         }
 
-        private DateTime ObterDataValida(string prompt) //aqui ele ta aceitando datas de nascimento invalidas como 20-32-34
+        private DateTime ObterDataNascimento(string prompt) 
         {
             DateTime data;
+            string[] formatos = {"dd/MM/yyyy"};
             do
             {
                 Console.WriteLine(prompt);
@@ -217,15 +219,17 @@ namespace CadastroAlunos.Models
             return char.Parse(sexo);
         }
 
-        private string ObterEmailValido(string prompt, string mensagemErro) //aqui ele ta aceitando e-mails só com @exemplo.com
+        private string ObterEmailValido(string prompt, string mensagemErro) 
         {
             string email;
+            string padraoEmail = @"^[^@\s]+@[^@\s]+\.(com|com\.br|br)$"; // Regex para validar o e-mail
+
             do
             {
                 Console.WriteLine(prompt);
                 email = Console.ReadLine().Trim();
 
-                if (!new EmailAddressAttribute().IsValid(email) || !email.EndsWith("@exemplo.com"))
+                if (!Regex.IsMatch(email, padraoEmail, RegexOptions.IgnoreCase))
                 {
                     Console.WriteLine(mensagemErro);
                 }
@@ -236,7 +240,27 @@ namespace CadastroAlunos.Models
 
             } while (true);
         }
+        private string ObterTelefoneValido(string prompt, string mensagemErro)
+        {
+            string telefone;
+            string padraoTelefone = @"^\(\d{2}\) 9\d{4}-\d{4}$"; // Regex para telefone BR
 
+            do
+            {
+                Console.WriteLine(prompt);
+                telefone = Console.ReadLine().Trim();
+
+                if (!Regex.IsMatch(telefone, padraoTelefone))
+                {
+                    Console.WriteLine(mensagemErro);
+                }
+                else
+                {
+                    return telefone;
+                }
+
+            } while (true);
+        }
         public async Task<Endereco> ObterEnderecoPorCepAsync(string cep)
         {
             if (string.IsNullOrWhiteSpace(cep))
