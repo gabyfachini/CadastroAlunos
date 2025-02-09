@@ -26,7 +26,6 @@ namespace CadastroAlunos.Services
         public void SoftDelete(string connectionString, int alunoId)
         {
             _alunoRepository.SoftDelete(alunoId);
-
         }
     }
 }
