@@ -26,7 +26,7 @@ internal class Program
         {
             Menu();
             string opcao = Console.ReadLine();
-            Console.WriteLine();
+            /*Console.WriteLine();*/
 
             switch (opcao)
             {
@@ -56,7 +56,7 @@ internal class Program
 
                 default:
                     Console.WriteLine("Opção inválida!");
-                    Thread.Sleep(2000); //Agurda 2s para limpar e pedir o menu novamente
+                    Thread.Sleep(500); //Agurda 0.5s para limpar e pedir o menu novamente
                     Console.Clear();
                     continue; // Continua pedindo a opção
             }
