@@ -26,7 +26,6 @@ internal class Program
         {
             Menu();
             string opcao = Console.ReadLine();
-            /*Console.WriteLine();*/
 
             switch (opcao)
             {
