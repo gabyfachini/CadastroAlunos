@@ -11,5 +11,6 @@ namespace CadastroAlunos.Interfaces
     {
         List<Aluno> ListarAlunos(); //Vale para o case 2 e 3
         void SoftDelete(string connectionString, int alunoId);
+
     }
 }

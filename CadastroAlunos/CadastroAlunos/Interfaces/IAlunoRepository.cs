@@ -14,5 +14,6 @@ namespace CadastroAlunos.Interfaces
         Task<Aluno> BuscarEnderecoPorCepAsync(string cep);*/
         List<Aluno> GetList(); //Vale para o case 2 e 3
         Task SoftDelete(int id); //SoftDelete
+
     }
 }
