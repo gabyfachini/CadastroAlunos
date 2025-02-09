@@ -15,11 +15,14 @@ namespace CadastroAlunos.Models
 
     {
         private readonly IAlunoService _alunoService;
+        private readonly IViaCepService _viaCepService;
         private readonly IAlunoRepository _alunoRepository;
 
-        public AlunoPresentation(IAlunoService alunoService)
+        public AlunoPresentation(IAlunoService alunoService, IViaCepService viaCepService, IAlunoRepository alunoRepository)
         {
             _alunoService = alunoService;
+            _viaCepService = viaCepService;
+            _alunoRepository = alunoRepository;
         }
 
         public async Task RegisterStudents()
@@ -31,25 +34,46 @@ namespace CadastroAlunos.Models
             novoAluno.Nascimento = ObterDataValida("Digite a data de nascimento (formato: YYYY-MM-DD):");
             novoAluno.Sexo = ObterSexoValido("Digite o sexo (M/F):");
             novoAluno.Email = ObterEmailValido("Digite o email:", "E-mail inválido ou o e-mail não pertence ao domínio 'exemplo.com'.");
-            novoAluno.Telefone = ObterEntradaValida("Digite o telefone:", "Telefone não pode ser vazio."); //ele aceita qualquer telefone, mesmo sendo vazio
+            novoAluno.Telefone = ObterEntradaValida("Digite o telefone:", "Telefone não pode ser vazio.");
 
             novoAluno.DataDeAtualizacao = novoAluno.DataDeCadastro = DateTime.Now;
             novoAluno.Ativo = true;
 
-            novoAluno = await ObterEnderecoPorCepAsync(novoAluno); //se eu colocar um cep ruim,ele zera tudo e não da mensagem de erro
-            /*Thread.Sleep(2000);*/
+            Console.WriteLine("Digite o CEP:");
+            novoAluno.Cep = Console.ReadLine()?.Trim();
 
-            if (ValidarAluno(novoAluno))
-             {
-                 await _alunoRepository.CadastrarAlunoAsync(novoAluno);
+            try
+            {
+                var endereco = await ObterEnderecoPorCepAsync(novoAluno.Cep);
 
-                 Console.WriteLine("Aluno cadastrado com sucesso!");
-             }
+                if (endereco == null)
+                {
+                    Console.WriteLine("Cadastro não concluído devido a erro no endereço.");
+                    return;
+                }
 
+                // Atribuir os dados do endereço ao aluno
+                novoAluno.Logradouro = endereco.Logradouro;
+                novoAluno.Complemento = string.IsNullOrWhiteSpace(endereco.Complemento) ? "N/A" : endereco.Complemento;
+                novoAluno.Bairro = endereco.Bairro;
+                novoAluno.Localidade = endereco.Localidade;
+                novoAluno.UF = endereco.UF;
+
+                if (ValidarAluno(novoAluno))
+                {
+                    await _alunoRepository.CadastrarAlunoAsync(novoAluno);
+                    Console.WriteLine("Aluno cadastrado com sucesso!");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao buscar endereço: {ex.Message}");
+            }
+            Thread.Sleep(5000); //aqui ta aparecendo o menu antes dos dados
             Console.Clear();
         }
 
-            public void StudentList()
+        public void StudentList()
         {
             Console.Clear();
             Console.WriteLine("REGISTRO DE ALUNOS\n");
@@ -213,48 +237,21 @@ namespace CadastroAlunos.Models
             } while (true);
         }
 
-        private async Task<Aluno> ObterEnderecoPorCepAsync(Aluno aluno)
+        public async Task<Endereco> ObterEnderecoPorCepAsync(string cep)
         {
-            var viaCepService = new ViaCepService(new HttpClient());
-            string cep;
-            Endereco endereco;
-
-            do
+            if (string.IsNullOrWhiteSpace(cep))
             {
-                Console.WriteLine("Digite o CEP:");
-                cep = Console.ReadLine()?.Trim();
+                throw new ArgumentException("CEP inválido.");
+            }
 
-                endereco = await viaCepService.BuscarEnderecoPorCepAsync(cep);
+            var endereco = await _viaCepService.BuscarEnderecoPorCepAsync(cep);
 
-                if (endereco == null)
-                {
-                    Console.WriteLine("Endereço não encontrado. Tente novamente.");
-                }
+            if (endereco == null)
+            {
+                throw new Exception("Endereço não encontrado.");
+            }
 
-            } while (endereco == null);
-
-            // Preenchendo os dados do aluno com o endereço encontrado
-            aluno.Cep = endereco.Cep;
-            aluno.Logradouro = endereco.Logradouro;
-            aluno.Complemento = string.IsNullOrWhiteSpace(endereco.Complemento) ? "N/A" : endereco.Complemento;
-            aluno.Bairro = endereco.Bairro;
-            aluno.Localidade = endereco.Localidade;
-            aluno.UF = endereco.UF;
-
-            // Exibindo os dados do endereço antes de continuar
-            Console.WriteLine("\nDados do Endereço do Aluno:");
-            Console.WriteLine($"CEP: {endereco.Cep}");
-            Console.WriteLine($"Logradouro: {endereco.Logradouro}");
-            Console.WriteLine($"Complemento: {endereco.Complemento}");
-            Console.WriteLine($"Bairro: {endereco.Bairro}");
-            Console.WriteLine($"Localidade: {endereco.Localidade}");
-            Console.WriteLine($"UF: {endereco.UF}");
-
-            // Aguarda o usuário pressionar uma tecla antes de continuar
-            Console.WriteLine("\nPressione Enter para continuar...");
-            Console.ReadLine();
-
-            return aluno;
+            return endereco;
         }
 
         private bool ValidarAluno(Aluno aluno)
@@ -270,7 +267,6 @@ namespace CadastroAlunos.Models
                     Console.WriteLine($"Erro de validação: {validationResult.ErrorMessage}");
                 }
             }
-
             return isValid;
         }
     }

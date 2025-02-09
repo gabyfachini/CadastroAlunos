@@ -82,6 +82,8 @@ internal class Program
             .AddScoped<IAlunoRepository, AlunoRepository>() //criados por solicitação, sempre sera uma nova instância para cada requisição
             .AddScoped<IAlunoService, AlunoService>() //criados por solicitação
             .AddScoped<AlunoPresentation>() //criados por solicitação
+            .AddScoped<IViaCepService, ViaCepService>()
+            .AddHttpClient()
             .BuildServiceProvider(); //cria o provedor de serviços, que é o que vai gerenciar a criação e a resolução dos serviços no restante do código
     }
 }

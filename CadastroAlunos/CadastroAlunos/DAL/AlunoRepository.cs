@@ -19,6 +19,51 @@ namespace CadastroAlunos.DAL
         {
             _connectionString = iconfiguration.GetConnectionString("Default");
         }
+        public async Task CadastrarAlunoAsync(Aluno aluno)
+        {
+            if (aluno == null)
+            {
+                throw new ArgumentNullException(nameof(aluno), "O aluno não pode ser nulo.");
+            }
+
+            var sql = @"
+            INSERT INTO Aluno 
+            (Nome, Sobrenome, Nascimento, Sexo, Email, Telefone, Cep, Logradouro, Complemento, Bairro, Localidade, UF, DataDeCadastro, DataDeAtualizacao, Ativo)
+            VALUES
+            (@Nome, @Sobrenome, @Nascimento, @Sexo, @Email, @Telefone, @Cep, @Logradouro, @Complemento, @Bairro, @Localidade, @UF,  @DataDeCadastro, @DataDeAtualizacao, @Ativo)";
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@Nome", aluno.Nome);
+                    command.Parameters.AddWithValue("@Sobrenome", aluno.Sobrenome);
+                    command.Parameters.AddWithValue("@Nascimento", aluno.Nascimento);
+                    command.Parameters.AddWithValue("@Sexo", aluno.Sexo);
+                    command.Parameters.AddWithValue("@Email", aluno.Email);
+                    command.Parameters.AddWithValue("@Telefone", aluno.Telefone);
+                    command.Parameters.AddWithValue("@Cep", aluno.Cep);
+                    command.Parameters.AddWithValue("@Logradouro", aluno.Logradouro);
+                    command.Parameters.AddWithValue("@Complemento", aluno.Complemento);
+                    command.Parameters.AddWithValue("@Bairro", aluno.Bairro);
+                    command.Parameters.AddWithValue("@Localidade", aluno.Localidade);
+                    command.Parameters.AddWithValue("@UF", aluno.UF);
+                    command.Parameters.AddWithValue("@DataDeCadastro", aluno.DataDeCadastro);
+                    command.Parameters.AddWithValue("@DataDeAtualizacao", aluno.DataDeAtualizacao);
+                    command.Parameters.AddWithValue("@Ativo", aluno.Ativo);
+
+                    try
+                    {
+                        await connection.OpenAsync();
+                        await command.ExecuteNonQueryAsync();  // Executa de forma assíncrona
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Erro ao cadastrar aluno: {ex.Message}");
+                    }
+                }
+            }
+        }
         public List<Aluno> GetList()
         {
             var listAluno = new List<Aluno>();
