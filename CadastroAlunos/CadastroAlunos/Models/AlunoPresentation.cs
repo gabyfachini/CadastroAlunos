@@ -1,5 +1,6 @@
 ﻿using CadastroAlunos.DAL;
 using CadastroAlunos.Interfaces;
+using CadastroAlunos.Services;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -19,32 +20,34 @@ namespace CadastroAlunos.Models
             _alunoService = alunoService;
         }
 
-        public void RegisterStudents()
+        public async Task RegisterStudents()
         {
-                /*var novoAluno = new Aluno();
+            var novoAluno = new Aluno();
 
-                novoAluno.Nome = ObterEntradaValida("Digite o nome do aluno:", "Nome deve ter entre 2 e 100 caracteres e não pode ser vazio.");
-                novoAluno.Sobrenome = ObterEntradaValida("Digite o sobrenome do aluno:", "Sobrenome deve ter entre 2 e 100 caracteres e não pode ser vazio.");
-                novoAluno.Nascimento = ObterDataValida("Digite a data de nascimento (formato: YYYY-MM-DD):");
-                novoAluno.Sexo = ObterSexoValido("Digite o sexo (M/F):");
-                novoAluno.Email = ObterEmailValido("Digite o email:", "E-mail inválido ou o e-mail não pertence ao domínio 'exemplo.com'.");
-                novoAluno.Telefone = ObterEntradaValida("Digite o telefone:", "Telefone não pode ser vazio.");
+            /*novoAluno.Nome = ObterEntradaValida("Digite o nome do aluno:", "Nome deve ter entre 2 e 100 caracteres e não pode ser vazio.");
+            novoAluno.Sobrenome = ObterEntradaValida("Digite o sobrenome do aluno:", "Sobrenome deve ter entre 2 e 100 caracteres e não pode ser vazio.");
+            novoAluno.Nascimento = ObterDataValida("Digite a data de nascimento (formato: YYYY-MM-DD):");
+            novoAluno.Sexo = ObterSexoValido("Digite o sexo (M/F):");
+            novoAluno.Email = ObterEmailValido("Digite o email:", "E-mail inválido ou o e-mail não pertence ao domínio 'exemplo.com'.");
+            novoAluno.Telefone = ObterEntradaValida("Digite o telefone:", "Telefone não pode ser vazio."); //ele aceita qualquer telefone, mesmo sendo vazio
 
-                novoAluno.DataDeAtualizacao = novoAluno.DataDeCadastro = DateTime.Now;
-                novoAluno.Ativo = true;
+            novoAluno.DataDeAtualizacao = novoAluno.DataDeCadastro = DateTime.Now;
+            novoAluno.Ativo = true;*/
 
-                novoAluno = await ObterEnderecoPorCepAsync(novoAluno);
+            novoAluno = await ObterEnderecoPorCepAsync(novoAluno); //se eu colocar um cep ruim,ele zera tudo e não da mensagem de erro
+            Thread.Sleep(2000);
 
-                if (ValidarAluno(novoAluno))
-                {
-                    string connectionString = _connectionString.GetConnectionString("Default");
-                    CadastrarAluno(novoAluno, connectionString);
+            /* if (ValidarAluno(novoAluno))
+             {
+                 await _alunoRepository.CadastrarAlunoAsync(novoAluno);
 
-                    Console.WriteLine("Aluno cadastrado com sucesso!");
-                }
-                Console.Clear();*/
+                 Console.WriteLine("Aluno cadastrado com sucesso!");
+             }*/
+
+            Console.Clear();
         }
-        public void StudentList()
+
+            public void StudentList()
         {
             Console.Clear();
             Console.WriteLine("REGISTRO DE ALUNOS\n");
@@ -129,61 +132,83 @@ namespace CadastroAlunos.Models
         }
 
         //Métodos Extras: 
-        /*private string ObterEntradaValida(string prompt, string mensagemErro)
+        private string ObterEntradaValida(string prompt, string mensagemErro)
         {
-            Console.WriteLine(prompt);
-            string entrada = Console.ReadLine();
+            string entrada;
 
-            if (string.IsNullOrWhiteSpace(entrada) || entrada.Length < 2 || entrada.Length > 100)
+            do
             {
-                Console.WriteLine(mensagemErro);
-                return null;
-            }
+                Console.WriteLine(prompt);
+                entrada = Console.ReadLine();
 
-            return entrada;
+                if (string.IsNullOrWhiteSpace(entrada) || entrada.Length < 2 || entrada.Length > 100)
+                {
+                    Console.WriteLine(mensagemErro);
+                }
+                else
+                {
+                    return entrada;
+                }
+
+            } while (true);
         }
 
-        private DateTime ObterDataValida(string prompt)
+        private DateTime ObterDataValida(string prompt) //aqui ele ta aceitando datas de nascimento invalidas como 20-32-34
         {
-            Console.WriteLine(prompt);
             DateTime data;
-            if (DateTime.TryParse(Console.ReadLine(), out data))
+            do
             {
-                return data;
-            }
-            else
-            {
-                Console.WriteLine("Data de nascimento inválida! Tente novamente.");
-                return DateTime.MinValue;  // Retorna uma data inválida para que o código saiba que houve erro.
-            }
+                Console.WriteLine(prompt);
+                string entrada = Console.ReadLine();
+
+                if (!DateTime.TryParse(entrada, out data))
+                {
+                    Console.WriteLine("Data de nascimento inválida! Tente novamente.");
+                }
+                else
+                {
+                    return data;
+                }
+
+            } while (true);
         }
 
         private char ObterSexoValido(string prompt)
         {
-            Console.WriteLine(prompt);
             string sexo;
             do
             {
-                sexo = Console.ReadLine().ToUpper();
+                Console.WriteLine(prompt);
+                sexo = Console.ReadLine().Trim().ToUpper();
+
                 if (sexo != "M" && sexo != "F")
                 {
-                    Console.WriteLine("Entrada inválida. Digite Novamente!");
+                    Console.WriteLine("Entrada inválida. Digite 'M' para masculino ou 'F' para feminino.");
                 }
+
             } while (sexo != "M" && sexo != "F");
 
             return char.Parse(sexo);
         }
 
-        private string ObterEmailValido(string prompt, string mensagemErro)
+        private string ObterEmailValido(string prompt, string mensagemErro) //aqui ele ta aceitando e-mails só com @exemplo.com
         {
-            Console.WriteLine(prompt);
-            string email = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(email) || !new EmailAddressAttribute().IsValid(email) || !email.EndsWith("@exemplo.com"))
+            string email;
+            do
             {
-                Console.WriteLine(mensagemErro);
-                return null;
-            }
-            return email;
+                Console.WriteLine(prompt);
+                email = Console.ReadLine().Trim();
+
+                if (!new EmailAddressAttribute().IsValid(email) || !email.EndsWith("@exemplo.com"))
+                {
+                    Console.WriteLine(mensagemErro);
+                }
+                else
+                {
+                    return email;
+                }
+
+            } while (true);
         }
 
         private async Task<Aluno> ObterEnderecoPorCepAsync(Aluno aluno)
@@ -218,7 +243,7 @@ namespace CadastroAlunos.Models
             return aluno;
         }
 
-        private bool ValidarAluno(Aluno aluno)
+        /*private bool ValidarAluno(Aluno aluno)
         {
             var validationContext = new ValidationContext(aluno);
             var validationResults = new List<ValidationResult>();
