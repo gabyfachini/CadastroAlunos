@@ -28,7 +28,7 @@ namespace CadastroAlunos.Models
 
         public async Task RegisterStudents()
         {
-            var novoAluno = new Aluno();
+            var novoAluno = new Aluno(); //não é interesante usar isso 
 
             novoAluno.Nome = ObterEntradaValida("Digite o nome do aluno:", "Nome deve ter entre 2 e 100 caracteres e não pode ser vazio.");
             novoAluno.Sobrenome = ObterEntradaValida("Digite o sobrenome do aluno:", "Sobrenome deve ter entre 2 e 100 caracteres e não pode ser vazio.");
