@@ -1,4 +1,4 @@
-# Sistema de Cadastro de Alunos - Academia
+# Sistema de Cadastro de Alunos
 
 Este repositório contém o projeto de um **sistema de cadastro de alunos**, desenvolvido em **C#**. O sistema permite o cadastro de alunos, armazenamento de dados em um banco de dados local e captura de informações de endereço via API de CEP.
 
