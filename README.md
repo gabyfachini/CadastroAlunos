@@ -34,12 +34,10 @@ O projeto é estruturado da seguinte maneira:
 ## Como Usar
 
 ### 1. Clone o Repositório
-
 Primeiro, clone o repositório para sua máquina local:
-
 ```bash
 git clone https://github.com/gabyfachini/CadastroAlunos.git
-
+```
 ### 2. Navegue até o Diretório do Projeto
 ### 3. Instale as Dependências
 ### 4. Configure o Banco de Dados
