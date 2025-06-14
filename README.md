@@ -1,23 +1,75 @@
-# 📚 Student Registration System
+# Student Registration System
 
-This repository contains a **student registration system** project developed in **C#**. The system allows for student registration, local database storage, and automatic address retrieval via a ZIP code API.
+## Overview
 
-## 📝 Project Description
+This is a **Student Registration System** built in C# using a clean architecture approach with dependency injection. The system allows you to register, list, search, update, and softly delete student records. It also integrates with the **ViaCep** API to automatically retrieve Brazilian address information based on postal codes (CEP).
 
-The goal of this project is to create a simple system for registering students or users. Users can add new students, save their information, and use an external API to automatically fetch address details based on the entered ZIP code. All student data is stored in a **SQL Server** database to ensure persistence.
+---
 
-## 🚀 Features
+## Features
 
-- **Student Registration**: Register students with name, email, phone number, birth date, address, and other relevant details.
-- **Address Lookup via ZIP Code API**: When a ZIP code is entered, the system fetches the address fields (street, neighborhood, city, state) automatically using an external API.
-- **Database Storage**: Student data is saved to a local **SQL Server** database, enabling efficient data management.
-- **Student Listing**: View a list of registered students and search by their registration ID.
+- Register new students with validated inputs (name, surname, birthdate, gender, email, phone, and address).
+- List all registered students.
+- Search for a student by their ID.
+- Update student information (function to be implemented).
+- Soft delete a student (mark as inactive).
+- Automatic address lookup using ViaCep API.
+- Input validations for email, phone, dates, and other fields.
+- Dependency Injection for better modularity and testability.
 
-## 🛠️ Technologies Used
+---
 
-- **Language**: C#
-- **Framework**: .NET 6 or higher
-- **Database**: SQL Server (can be replaced with MySQL, SQLite, etc.)
-- **ZIP Code API**: Public API such as [ViaCEP](https://viacep.com.br/)
-- **Libraries**: Dapper, Dependency Injection, HTTP Client
+## Technologies Used
 
+- .NET / C#
+- Dependency Injection with Microsoft.Extensions.DependencyInjection
+- HTTP Client for external API requests (ViaCep)
+- JSON Serialization / Deserialization
+- Regular Expressions for input validation
+- Console application for user interaction
+
+---
+
+## How to Use
+
+1. Run the application.
+2. Use the menu to choose the operation you want:
+   - Register a new student.
+   - List all students.
+   - Search for a student by ID.
+   - Update student data (coming soon).
+   - Soft delete a student.
+   - Exit the program.
+
+3. Follow the prompts to enter data when registering or searching students.
+
+---
+
+## Project Structure
+
+- **Models**: Contains student and address models.
+- **Services**: Business logic like student service and ViaCep address lookup service.
+- **Repositories**: Data access layer handling storage and retrieval.
+- **Presentation**: Console UI logic for interacting with users.
+- **Program**: Application entry point, dependency injection setup, and main menu loop.
+
+---
+
+## Notes
+
+- The update student function is planned but not yet implemented.
+- The system assumes Brazilian postal codes (CEP) format.
+- Soft delete only marks a student as inactive without removing data.
+- The project uses asynchronous calls for external API requests.
+
+---
+
+## License
+
+This project is open source and free to use.
+
+---
+
+## Author
+
+Developed by Gabryella Fachini.

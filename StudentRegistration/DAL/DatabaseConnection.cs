@@ -16,4 +16,4 @@ internal static class DatabaseConnection
     {
         return Configuration.GetConnectionString(name);
     }
-} 
+}

@@ -5,11 +5,11 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace CadastroAlunos.Models
+namespace StudentRegistration.Models
 {
-    public class Endereco
+    public class Address
     {
-        [JsonPropertyName("cep")] // Especificar o nome exato do campo JSON para evitar erros
+        [JsonPropertyName("cep")] // Specify the exact JSON field name to avoid errors
         public string Cep { get; set; }
 
         [JsonPropertyName("logradouro")]
