@@ -1,14 +1,14 @@
-﻿using CadastroAlunos.Models;
+﻿using StudentRegistration.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CadastroAlunos.Interfaces
+namespace StudentRegistration.Interfaces
 {
     public interface IViaCepService
     {
-        Task<Endereco?> BuscarEnderecoPorCepAsync(string cep);
+        Task<Address?> GetAddressByZipCodeAsync(string zipCode);
     }
 }

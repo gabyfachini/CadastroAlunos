@@ -7,7 +7,6 @@ CadastroAlunos/.vs/CadastroAlunos/v17/.suo
 *.exe
 *.props
 *.targets
-*.cs
 *.cache
 *.editorconfig
 *.Up2Date

@@ -1,5 +1,5 @@
-﻿using CadastroAlunos.Interfaces;
-using CadastroAlunos.Models;
+﻿using StudentRegistration.Interfaces;
+using StudentRegistration.Models;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -9,21 +9,21 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
 
-namespace CadastroAlunos.DAL
+namespace StudentRegistration.DAL
 {
-    public class AlunoRepository : IAlunoRepository
+    public class StudentRepository : IStudentRepository
 
     {
         private string _connectionString;
-        public AlunoRepository(IConfiguration iconfiguration)
+        public StudentRepository(IConfiguration iconfiguration)
         {
             _connectionString = iconfiguration.GetConnectionString("Default");
         }
-        public async Task CadastrarAlunoAsync(Aluno aluno)
+        public async Task RegisterStudentAsync(Student student)
         {
-            if (aluno == null)
+            if (student == null)
             {
-                throw new ArgumentNullException(nameof(aluno), "O aluno não pode ser nulo.");
+                throw new ArgumentNullException(nameof(student), "Student cannot be null.");
             }
 
             var sql = @"
@@ -36,49 +36,49 @@ namespace CadastroAlunos.DAL
             {
                 using (var command = new SqlCommand(sql, connection))
                 {
-                    command.Parameters.AddWithValue("@Nome", aluno.Nome);
-                    command.Parameters.AddWithValue("@Sobrenome", aluno.Sobrenome);
-                    command.Parameters.AddWithValue("@Nascimento", aluno.Nascimento);
-                    command.Parameters.AddWithValue("@Sexo", aluno.Sexo);
-                    command.Parameters.AddWithValue("@Email", aluno.Email);
-                    command.Parameters.AddWithValue("@Telefone", aluno.Telefone);
-                    command.Parameters.AddWithValue("@Cep", aluno.Cep);
-                    command.Parameters.AddWithValue("@Logradouro", aluno.Logradouro);
-                    command.Parameters.AddWithValue("@Complemento", aluno.Complemento);
-                    command.Parameters.AddWithValue("@Bairro", aluno.Bairro);
-                    command.Parameters.AddWithValue("@Localidade", aluno.Localidade);
-                    command.Parameters.AddWithValue("@UF", aluno.UF);
-                    command.Parameters.AddWithValue("@DataDeCadastro", aluno.DataDeCadastro);
-                    command.Parameters.AddWithValue("@DataDeAtualizacao", aluno.DataDeAtualizacao);
-                    command.Parameters.AddWithValue("@Ativo", aluno.Ativo);
+                    command.Parameters.AddWithValue("@Nome", student.Nome);
+                    command.Parameters.AddWithValue("@Sobrenome", student.Sobrenome);
+                    command.Parameters.AddWithValue("@Nascimento", student.Nascimento);
+                    command.Parameters.AddWithValue("@Sexo", student.Sexo);
+                    command.Parameters.AddWithValue("@Email", student.Email);
+                    command.Parameters.AddWithValue("@Telefone", student.Telefone);
+                    command.Parameters.AddWithValue("@Cep", student.Cep);
+                    command.Parameters.AddWithValue("@Logradouro", student.Logradouro);
+                    command.Parameters.AddWithValue("@Complemento", student.Complemento);
+                    command.Parameters.AddWithValue("@Bairro", student.Bairro);
+                    command.Parameters.AddWithValue("@Localidade", student.Localidade);
+                    command.Parameters.AddWithValue("@UF", student.UF);
+                    command.Parameters.AddWithValue("@DataDeCadastro", student.RegistrationDate);
+                    command.Parameters.AddWithValue("@DataDeAtualizacao", student.UpdateDate);
+                    command.Parameters.AddWithValue("@Ativo", student.IsActive);
 
                     try
                     {
                         await connection.OpenAsync();
-                        await command.ExecuteNonQueryAsync();  // Executa de forma assíncrona
+                        await command.ExecuteNonQueryAsync();  
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Erro ao cadastrar aluno: {ex.Message}");
+                        Console.WriteLine($"Error registering student: {ex.Message}");
                     }
                 }
             }
         }
-        public List<Aluno> GetList()
+        public List<Student> GetList()
         {
-            var listAluno = new List<Aluno>();
+            var studentList = new List<Student>();
             try
             {
                 using (SqlConnection con = new SqlConnection(_connectionString))
                 {
-                    // Consulta SQL com o filtro Ativo = 1, ou seja, não exibe usuários que estão inativados no Banco de Dados
+                    // SQL query with the filter Active = 1, that is, it does not display users that are inactive in the Database
                     SqlCommand cmd = new SqlCommand("SELECT Id, Nome, Sobrenome, Nascimento, Sexo, Email, Telefone, Cep, Logradouro, Complemento, Bairro, Localidade, UF, DataDeAtualizacao, Ativo FROM Aluno WHERE Ativo = 1", con);
-                    cmd.CommandType = CommandType.Text; // Mudando de CommandType.StoredProcedure para CommandType.Text para usar a consulta SQL diretamente
+                    cmd.CommandType = CommandType.Text; // Changing from CommandType.StoredProcedure to CommandType.Text to use SQL query directly
                     con.Open();
                     SqlDataReader rdr = cmd.ExecuteReader();
                     while (rdr.Read())
                     {
-                        listAluno.Add(new Aluno
+                        studentList.Add(new Student
                         {
                             Id = Convert.ToInt32(rdr[0]),
                             Nome = Convert.ToString(rdr[1]),
@@ -93,9 +93,9 @@ namespace CadastroAlunos.DAL
                             Bairro = Convert.ToString(rdr[10]),
                             Localidade = Convert.ToString(rdr[11]),
                             UF = Convert.ToString(rdr[12]),
-                            DataDeAtualizacao = Convert.ToDateTime(rdr[13]),
-                            Ativo = Convert.ToBoolean(rdr[14])
-                            //Observação: aqui eu não trouxe a DataDeCadastro porque é uma informação interna do Banco de Dados, caso seja necessária, é precisso incluir aqui para visualização da informação
+                            UpdateDate = Convert.ToDateTime(rdr[13]),
+                            IsActive = Convert.ToBoolean(rdr[14])
+                            // Note: I did not bring the RegistrationDate because it is internal information from the database. If needed, it can be added here.
                         });
                     }
                 }
@@ -104,13 +104,13 @@ namespace CadastroAlunos.DAL
             {
                 throw ex;
             }
-            return listAluno;
+            return studentList;
         }
         public async Task SoftDelete(int id)
         {
             var sql = @"
-            UPDATE Aluno 
-            SET Ativo = 0, DataDeAtualizacao = @DataDeAtualizacao 
+            UPDATE Aluno
+            SET Ativo = 0, DataDeAtualizacao = @DataDeAtualizacao
             WHERE Id = @Id";
 
             using (var connection = new SqlConnection(_connectionString))
@@ -122,26 +122,26 @@ namespace CadastroAlunos.DAL
 
                     try
                     {
-                        await connection.OpenAsync();  // Usando async para abrir a conexão
-                        int rowsAffected = await command.ExecuteNonQueryAsync();  // Usando async para a execução da query
+                        await connection.OpenAsync();  
+                        int rowsAffected = await command.ExecuteNonQueryAsync();  
 
                         if (rowsAffected > 0)
                         {
-                            Console.WriteLine($"Aluno com ID {id} foi marcado como inativo.");
-                            Console.WriteLine("Digite a opção desejada: ");
+                            Console.WriteLine($"Student with ID {id} has been marked as inactive.");
+                            Console.WriteLine("Enter the desired option: ");
                         }
                         else
                         {
-                            Console.WriteLine("Aluno não encontrado no banco de dados.");
-                            Console.WriteLine("Digite a opção desejada: ");
+                            Console.WriteLine("Student not found in the database.");
+                            Console.WriteLine("Enter the desired option: ");
                         }
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Erro ao desativar aluno: {ex.Message}");
+                        Console.WriteLine($"Error deactivating student: {ex.Message}");
                     }
                 }
             }
         }
     }
-    }
+}
